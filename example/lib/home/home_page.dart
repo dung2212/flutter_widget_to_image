@@ -14,7 +14,7 @@ class HomePage extends StatefulWidget {
 
 class _HomePageState extends State<HomePage> {
   _shot() async {
-    var image = await FlutterWidgetToImage.captureFromWidget(const DemoView(), widthImage: 200, pixelRatio: 1);
+    var image = await FlutterWidgetToImage.captureFromWidget(const DemoView(), widthImage: 200);
     var image2 = await FlutterWidgetToImage.captureFromWidget(const DemoView(), widthImage: 200, pixelRatio: 1);
     Navigator.push(
       context,
