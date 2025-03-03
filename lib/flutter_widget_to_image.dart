@@ -1,12 +1,11 @@
 library flutter_widget_to_image;
+
 import 'dart:async';
 import 'dart:typed_data';
 import 'package:flutter/material.dart';
 import 'package:flutter/rendering.dart';
 import 'package:flutter/widgets.dart';
 import 'dart:ui' as ui;
-
-
 
 class FlutterWidgetToImage {
   static Future<Uint8List?> captureFromWidget(
@@ -43,20 +42,16 @@ class FlutterWidgetToImage {
     final RenderRepaintBoundary repaintBoundary = RenderRepaintBoundary();
     final platformDispatcher = WidgetsBinding.instance.platformDispatcher;
     final fallBackView = platformDispatcher.views.first;
-    final view =
-    context == null ? fallBackView : View.maybeOf(context) ?? fallBackView;
-    Size logicalSize =
-        targetSize ?? view.physicalSize / view.devicePixelRatio; // Adapted
-    Size imageSize = targetSize ?? view.physicalSize; // Adapted
+    final view = context == null ? fallBackView : View.maybeOf(context) ?? fallBackView;
+    Size logicalSize = view.physicalSize / view.devicePixelRatio; // Adapted
+    Size imageSize = view.physicalSize; // Adapted
 
     assert(logicalSize.aspectRatio.toStringAsPrecision(5) ==
-        imageSize.aspectRatio
-            .toStringAsPrecision(5)); // Adapted (toPrecision was not available)
+        imageSize.aspectRatio.toStringAsPrecision(5)); // Adapted (toPrecision was not available)
 
     final RenderView renderView = RenderView(
       view: view,
-      child: RenderPositionedBox(
-          alignment: Alignment.center, child: repaintBoundary),
+      child: RenderPositionedBox(alignment: Alignment.center, child: repaintBoundary),
       configuration: ViewConfiguration(
         // size: logicalSize,
         logicalConstraints: BoxConstraints(
@@ -80,8 +75,7 @@ class FlutterWidgetToImage {
     pipelineOwner.rootNode = renderView;
     renderView.prepareInitialFrame();
 
-    final RenderObjectToWidgetElement<RenderBox> rootElement =
-    RenderObjectToWidgetAdapter<RenderBox>(
+    final RenderObjectToWidgetElement<RenderBox> rootElement = RenderObjectToWidgetAdapter<RenderBox>(
         container: repaintBoundary,
         child: Directionality(
           textDirection: TextDirection.ltr,
@@ -112,8 +106,7 @@ class FlutterWidgetToImage {
       ///
       isDirty = false;
 
-      image = await repaintBoundary.toImage(
-          pixelRatio: pixelRatio ?? (imageSize.width / logicalSize.width));
+      image = await repaintBoundary.toImage(pixelRatio: pixelRatio ?? (imageSize.width / logicalSize.width));
 
       ///
       ///This delay sholud increas with Widget tree Size
@@ -152,7 +145,8 @@ class FlutterWidgetToImage {
       buildOwner.finalizeTree();
     } catch (e) {}
 
-    return image;
+    ByteData? byteData = await image.toByteData(format: ui.ImageByteFormat.png);
+    return byteData?.buffer.asUint8List();
     // WidgetsFlutterBinding.ensureInitialized();
     // final RenderRepaintBoundary repaintBoundary = RenderRepaintBoundary();
     //
